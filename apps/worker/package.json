@@ -1,0 +1,23 @@
+{
+  "name": "@scheduler/worker",
+  "version": "1.0.0",
+  "description": "Worker Daemon for atomic job claiming, leased execution, and heartbeats",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "ts-node src/main.ts",
+    "start": "node dist/main.js",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@scheduler/database": "^1.0.0",
+    "@scheduler/shared": "^1.0.0",
+    "@scheduler/types": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.4.5"
+  }
+}

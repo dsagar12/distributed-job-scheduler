@@ -1,0 +1,19 @@
+{
+  "name": "@scheduler/shared",
+  "version": "1.0.0",
+  "description": "Shared pure utilities, algorithms, backoff math, constants, and logging interfaces",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@scheduler/types": "^1.0.0",
+    "cron-parser": "^4.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.4.5"
+  }
+}

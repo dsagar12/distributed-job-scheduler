@@ -1,0 +1,14 @@
+{
+  "name": "@scheduler/types",
+  "version": "1.0.0",
+  "description": "Shared domain interfaces, DTOs, and state machine types",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@scheduler/scheduler",
+  "version": "1.0.0",
+  "description": "Scheduler Daemon for recurring cron evaluation, delayed job progression, and stuck lease recovery",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "ts-node src/main.ts",
+    "start": "node dist/main.js",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@scheduler/database": "^1.0.0",
+    "@scheduler/shared": "^1.0.0",
+    "@scheduler/types": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.4.5"
+  }
+}

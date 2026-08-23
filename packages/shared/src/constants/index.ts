@@ -1,0 +1,41 @@
+export const DEFAULT_CONFIG = {
+  JOB: {
+    DEFAULT_TIMEOUT_MS: 30000,
+    MAX_TIMEOUT_MS: 86400000, // 24 hours
+    DEFAULT_MAX_ATTEMPTS: 3,
+    DEFAULT_PRIORITY: 50,
+  },
+  RETRY: {
+    DEFAULT_INITIAL_DELAY_MS: 1000, // 1s
+    DEFAULT_MAX_DELAY_MS: 3600000, // 1 hour
+    DEFAULT_MULTIPLIER: 2,
+    DEFAULT_JITTER: true,
+  },
+  WORKER: {
+    DEFAULT_CONCURRENCY: 5,
+    DEFAULT_POLL_INTERVAL_MS: 500,
+    EMPTY_POLL_DELAY_MS: 1500,
+    DEFAULT_HEARTBEAT_INTERVAL_MS: 3000, // 3s
+    DEFAULT_LEASE_DURATION_MS: 15000, // 15s
+    DEAD_WORKER_THRESHOLD_MS: 20000, // 20s
+    SHUTDOWN_TIMEOUT_MS: 10000, // 10s
+  },
+  SCHEDULER: {
+    DEFAULT_POLL_INTERVAL_MS: 1000, // 1s
+    RECOVERY_POLL_INTERVAL_MS: 5000, // 5s
+    BATCH_SIZE: 100,
+  },
+  PAGINATION: {
+    DEFAULT_PAGE: 1,
+    DEFAULT_LIMIT: 20,
+    MAX_LIMIT: 100,
+  },
+} as const;
+
+export const REDIS_KEYS = {
+  WORKER_REGISTRY: 'scheduler:workers:registry',
+  WORKER_HEARTBEAT_PREFIX: 'scheduler:worker:heartbeat:',
+  QUEUE_ACTIVE_PREFIX: 'scheduler:queue:active:',
+  METRICS_PREFIX: 'scheduler:metrics:',
+  LOCK_PREFIX: 'scheduler:lock:',
+} as const;

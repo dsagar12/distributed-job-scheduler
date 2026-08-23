@@ -1,0 +1,55 @@
+{
+  "name": "distributed-job-scheduler-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade Distributed Background Job Scheduling Platform",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@scheduler/api",
+    "dev:worker": "npm run dev --workspace=@scheduler/worker",
+    "dev:scheduler": "npm run dev --workspace=@scheduler/scheduler",
+    "dev:dashboard": "npm run dev --workspace=@scheduler/dashboard",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:unit": "jest --config tests/unit/jest.config.js",
+    "test:integration": "jest --config tests/integration/jest.config.js",
+    "test:concurrency": "jest --config tests/concurrency/jest.config.js",
+    "db:generate": "npm run db:generate --workspace=@scheduler/database",
+    "db:migrate": "npm run db:migrate --workspace=@scheduler/database",
+    "db:seed": "npm run db:seed --workspace=@scheduler/database",
+    "db:studio": "npm run db:studio --workspace=@scheduler/database",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "keywords": [
+    "distributed-systems",
+    "job-scheduler",
+    "postgresql",
+    "redis",
+    "skip-locked",
+    "nestjs",
+    "react",
+    "typescript"
+  ],
+  "author": "Engineering Evaluation Candidate",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.9",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.2",
+    "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

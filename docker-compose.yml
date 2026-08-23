@@ -1,0 +1,179 @@
+services:
+  # ============================================================================
+  # POSTGRESQL - The Authoritative Source of Truth
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: scheduler_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scheduler_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scheduler_secret_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-distributed_job_scheduler}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scheduler_user} -d ${POSTGRES_DB:-distributed_job_scheduler}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+    networks:
+      - scheduler_network
+
+  # ============================================================================
+  # REDIS - Ephemeral Coordination, Caching, and PubSub
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: scheduler_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - scheduler_network
+
+  # ============================================================================
+  # API SERVICE - NestJS REST + WebSocket Gateway
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: scheduler_api
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-scheduler_user}:${POSTGRES_PASSWORD:-scheduler_secret_pw}@postgres:5432/${POSTGRES_DB:-distributed_job_scheduler}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_signing_key_change_in_production_min_32_chars_long}
+      - LOG_LEVEL=info
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scheduler_network
+
+  # ============================================================================
+  # SCHEDULER SERVICE - Cron, Delayed, Recovery Leader
+  # ============================================================================
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scheduler
+    container_name: scheduler_daemon
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-scheduler_user}:${POSTGRES_PASSWORD:-scheduler_secret_pw}@postgres:5432/${POSTGRES_DB:-distributed_job_scheduler}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - SCHEDULER_POLL_INTERVAL_MS=1000
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scheduler_network
+
+  # ============================================================================
+  # WORKER FLEET - Clustered Execution Agents
+  # ============================================================================
+  worker-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: scheduler_worker_1
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - WORKER_ID=worker-node-1
+      - WORKER_CONCURRENCY=5
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-scheduler_user}:${POSTGRES_PASSWORD:-scheduler_secret_pw}@postgres:5432/${POSTGRES_DB:-distributed_job_scheduler}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scheduler_network
+
+  worker-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: scheduler_worker_2
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - WORKER_ID=worker-node-2
+      - WORKER_CONCURRENCY=5
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-scheduler_user}:${POSTGRES_PASSWORD:-scheduler_secret_pw}@postgres:5432/${POSTGRES_DB:-distributed_job_scheduler}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scheduler_network
+
+  # ============================================================================
+  # DASHBOARD - React SPA UI
+  # ============================================================================
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: scheduler_dashboard
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    networks:
+      - scheduler_network
+
+networks:
+  scheduler_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
