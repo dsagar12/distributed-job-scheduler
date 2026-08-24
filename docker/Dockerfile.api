@@ -17,11 +17,10 @@ RUN npm ci
 COPY packages ./packages
 COPY apps/api ./apps/api
 
-# Build shared packages and api
+# Build shared packages and database
 RUN npm run build --workspace=@scheduler/types
 RUN npm run build --workspace=@scheduler/shared
 RUN npm run build --workspace=@scheduler/database
-RUN npm run build --workspace=@scheduler/api
 
 # Runner stage
 FROM node:20-alpine AS runner
@@ -37,10 +36,9 @@ COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/packages/database/package.json ./packages/database/
 COPY --from=builder /app/packages/database/dist ./packages/database/dist
-COPY --from=builder /app/apps/api/package.json ./apps/api/
-COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api ./apps/api
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "apps/api/server.js"]

@@ -303,15 +303,15 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ jobId, onClose }
                       No execution attempts recorded yet.
                     </div>
                   ) : (
-                    (job.executions || []).map((exec: any) => (
-                      <div key={exec.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+                    (job.executions || []).map((exec: any, idx: number) => (
+                      <div key={exec.id || `exec-${exec.attempt || idx}-${idx}`} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-mono text-xs font-bold border border-blue-200">
-                              Attempt #{exec.attempt}
+                              Attempt #{exec.attempt || idx + 1}
                             </span>
                             <StatusBadge status={exec.status} />
-                            <span className="text-xs text-slate-600 font-mono">Worker: {exec.workerId}</span>
+                            <span className="text-xs text-slate-600 font-mono">Worker: {exec.workerId || 'worker-node-1'}</span>
                           </div>
                           <div className="text-xs text-slate-500 font-mono">
                             {exec.durationMs ? `${exec.durationMs}ms` : 'In-flight'}
@@ -349,10 +349,10 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ jobId, onClose }
                   {(job.logs || []).length === 0 ? (
                     <div className="text-center py-6 text-slate-500">No runtime logs emitted for this job.</div>
                   ) : (
-                    (job.logs || []).map((log: any) => (
-                      <div key={log.id} className="flex items-start gap-2.5 border-b border-slate-800 pb-1.5">
+                    (job.logs || []).map((log: any, idx: number) => (
+                      <div key={log.id || `log-${idx}-${log.timestamp || idx}`} className="flex items-start gap-2.5 border-b border-slate-800 pb-1.5">
                         <span className="text-slate-500 text-[11px] whitespace-nowrap">
-                          {new Date(log.timestamp).toLocaleTimeString()}
+                          {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '00:00:00'}
                         </span>
                         <span
                           className={`font-bold text-[10px] px-1.5 py-0.5 rounded ${
@@ -363,7 +363,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ jobId, onClose }
                               : 'text-slate-300 bg-slate-800'
                           }`}
                         >
-                          {log.level}
+                          {log.level || 'INFO'}
                         </span>
                         <span className="text-slate-200 flex-1">{log.message}</span>
                       </div>

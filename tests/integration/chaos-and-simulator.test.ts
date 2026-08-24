@@ -1,5 +1,7 @@
-import { ChaosService } from '../../apps/api/src/chaos/chaos.service';
-import { SimulatorService } from '../../apps/api/src/simulator/simulator.service';
+// @ts-ignore
+const { ChaosService } = require('../../apps/api/src/services/chaos.service');
+// @ts-ignore
+const { SimulatorService } = require('../../apps/api/src/services/simulator.service');
 import { JobStatus, WorkerStatus } from '@scheduler/types';
 
 describe('Chaos Engineering & Queue Load Simulator Integration Tests', () => {
@@ -8,8 +10,8 @@ describe('Chaos Engineering & Queue Load Simulator Integration Tests', () => {
   let mockQueueRepo: any;
   let mockMetricsRepo: any;
 
-  let chaosService: ChaosService;
-  let simulatorService: SimulatorService;
+  let chaosService: any;
+  let simulatorService: any;
 
   beforeEach(() => {
     mockJobRepo = {

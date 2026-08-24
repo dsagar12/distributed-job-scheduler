@@ -35,9 +35,12 @@ export const InvestigatorPage: React.FC = () => {
     enabled: Boolean(activeProject?.id),
   });
 
+  const dlqItems = Array.isArray(dlqResponse) ? dlqResponse : (dlqResponse?.data || []);
+  const failedItems = Array.isArray(failedJobsResponse) ? failedJobsResponse : (failedJobsResponse?.data || []);
+
   const candidateJobs = [
-    ...(dlqResponse?.data || []),
-    ...(failedJobsResponse?.data || []),
+    ...dlqItems,
+    ...failedItems,
   ];
 
   // Analysis Mutation
@@ -47,6 +50,14 @@ export const InvestigatorPage: React.FC = () => {
       setAnalysisResult(data);
     },
   });
+
+  // Auto-analyze first candidate job if none selected
+  React.useEffect(() => {
+    if (!selectedJobId && candidateJobs.length > 0 && candidateJobs[0]?.id) {
+      setSelectedJobId(candidateJobs[0].id);
+      analyzeMutation.mutate(candidateJobs[0].id);
+    }
+  }, [candidateJobs.length]);
 
   const handleSelectAndAnalyze = (jobId: string) => {
     setSelectedJobId(jobId);

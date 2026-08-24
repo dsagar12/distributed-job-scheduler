@@ -47,7 +47,7 @@ export const DlqPage: React.FC<DlqPageProps> = ({ onSelectJob }) => {
     },
   });
 
-  const dlqItems = dlqResponse?.data || [];
+  const dlqItems = Array.isArray(dlqResponse) ? dlqResponse : (dlqResponse?.data || []);
 
   return (
     <div className="p-6 space-y-6">

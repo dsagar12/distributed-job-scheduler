@@ -174,10 +174,10 @@ export const MetricsPage: React.FC = () => {
               Completed
             </div>
             <div className="text-2xl font-bold text-slate-900 font-mono">
-              {metrics?.completedJobsCount?.toLocaleString() ?? 0}
+              {(metrics?.completedJobsCount ?? metrics?.completedJobs ?? 0).toLocaleString()}
             </div>
             <div className="text-xs text-emerald-600 font-semibold font-sans mt-0.5">
-              {metrics?.throughputPerMin ?? 0} jobs/min
+              {metrics?.throughputPerMinute ?? metrics?.throughputPerMin ?? 0} jobs/min
             </div>
           </div>
 
@@ -187,7 +187,7 @@ export const MetricsPage: React.FC = () => {
               Failed / DLQ
             </div>
             <div className="text-2xl font-bold text-rose-600 font-mono">
-              {metrics?.deadLetterJobsCount ?? 0}
+              {metrics?.deadLetterJobsCount ?? metrics?.dlqCount ?? 0}
             </div>
             <div className="text-xs text-slate-500 font-sans mt-0.5">Dead letters isolated</div>
           </div>
@@ -198,7 +198,7 @@ export const MetricsPage: React.FC = () => {
               Avg Duration
             </div>
             <div className="text-2xl font-bold text-slate-900 font-mono">
-              {metrics?.avgDurationMs ?? 0}
+              {metrics?.avgDurationMs ?? metrics?.p50DurationMs ?? 0}
               <span className="text-sm text-slate-400 font-normal">ms</span>
             </div>
             <div className="text-xs text-slate-500 font-sans mt-0.5">Mean execution latency</div>
@@ -210,7 +210,7 @@ export const MetricsPage: React.FC = () => {
               Queue Depth
             </div>
             <div className="text-2xl font-bold text-amber-600 font-mono">
-              {metrics?.queuedJobsCount ?? 0}
+              {metrics?.queueDepth ?? metrics?.queuedJobsCount ?? 0}
             </div>
             <div className="text-xs text-slate-500 font-sans mt-0.5">Pending queue claims</div>
           </div>

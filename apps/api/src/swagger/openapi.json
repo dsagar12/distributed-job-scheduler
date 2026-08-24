@@ -1,0 +1,169 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Distributed Job Scheduler & Control Plane API",
+    "description": "High-throughput, distributed background job scheduling and execution engine with atomic SKIP LOCKED concurrency, lease fencing, failure investigator heuristics, and chaos engineering capabilities.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Engineering Platform Team",
+      "email": "admin@scheduler.io"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Production Cluster v1 API Gateway"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user, organization, and project",
+        "tags": ["Authentication"],
+        "responses": { "201": { "description": "User successfully registered" } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate user credentials and issue JWT tokens",
+        "tags": ["Authentication"],
+        "responses": { "200": { "description": "Tokens issued" } }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get authenticated user profile and memberships",
+        "tags": ["Authentication"],
+        "responses": { "200": { "description": "User profile" } }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "summary": "Query jobs with pagination and filters",
+        "tags": ["Jobs"],
+        "responses": { "200": { "description": "List of jobs" } }
+      },
+      "post": {
+        "summary": "Enqueue a new job with priority and payload",
+        "tags": ["Jobs"],
+        "responses": { "201": { "description": "Job enqueued" } }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "summary": "Get job details by ID",
+        "tags": ["Jobs"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Job details" } }
+      }
+    },
+    "/jobs/{id}/cancel": {
+      "post": {
+        "summary": "Cancel an active or queued job",
+        "tags": ["Jobs"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Job cancelled" } }
+      }
+    },
+    "/jobs/{id}/executions": {
+      "get": {
+        "summary": "Get execution history and attempts for a job",
+        "tags": ["Jobs"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Execution history" } }
+      }
+    },
+    "/jobs/{id}/logs": {
+      "get": {
+        "summary": "Get logs and telemetry for a job",
+        "tags": ["Jobs"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Job execution logs" } }
+      }
+    },
+    "/queues": {
+      "get": {
+        "summary": "List queues for the active project",
+        "tags": ["Queues"],
+        "responses": { "200": { "description": "List of queues" } }
+      },
+      "post": {
+        "summary": "Create a new queue with concurrency limits",
+        "tags": ["Queues"],
+        "responses": { "201": { "description": "Queue created" } }
+      }
+    },
+    "/workers": {
+      "get": {
+        "summary": "List active workers in the cluster fleet",
+        "tags": ["Workers"],
+        "responses": { "200": { "description": "Worker fleet status" } }
+      }
+    },
+    "/metrics/overview": {
+      "get": {
+        "summary": "Get real-time cluster telemetry, queue depth, throughput, and latency percentiles",
+        "tags": ["Metrics"],
+        "responses": { "200": { "description": "Telemetry overview" } }
+      }
+    },
+    "/metrics/timeline": {
+      "get": {
+        "summary": "Get time-series historical metrics for charts",
+        "tags": ["Metrics"],
+        "responses": { "200": { "description": "Timeline metric points" } }
+      }
+    },
+    "/chaos/jobs/{jobId}/expire-lease": {
+      "post": {
+        "summary": "Simulate lease expiry by backdating leaseUntil timestamp",
+        "tags": ["Chaos Engineering"],
+        "parameters": [{ "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Lease artificially expired" } }
+      }
+    },
+    "/chaos/recover-leases": {
+      "post": {
+        "summary": "Trigger on-demand crash recovery sweep to reclaim orphaned leases",
+        "tags": ["Chaos Engineering"],
+        "responses": { "200": { "description": "Recovery sweep completed" } }
+      }
+    },
+    "/investigator/jobs/{jobId}/analyze": {
+      "get": {
+        "summary": "Run deterministic root-cause heuristic analysis on a failed job",
+        "tags": ["Investigator"],
+        "parameters": [{ "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Root cause diagnostic report" } }
+      }
+    },
+    "/simulator/burst": {
+      "post": {
+        "summary": "Inject synthetic high-load job bursts for stress testing",
+        "tags": ["Simulator"],
+        "responses": { "200": { "description": "Synthetic load injected" } }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check for DB and Redis connections",
+        "tags": ["Health"],
+        "responses": { "200": { "description": "Health status" } }
+      }
+    }
+  }
+}

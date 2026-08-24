@@ -109,9 +109,9 @@ export const QueuesPage: React.FC = () => {
               <tbody className="divide-y divide-slate-100 font-mono text-xs">
                 {queues.map((q: any) => {
                   const isPaused = q.status === 'PAUSED';
-                  const queued = q.metrics?.queuedCount || 0;
-                  const running = q.metrics?.runningCount || 0;
-                  const completed = q.metrics?.completedCount || 0;
+                  const queued = q.metrics?.queuedCount ?? q.metrics?.queued ?? 0;
+                  const running = q.metrics?.runningCount ?? q.metrics?.running ?? 0;
+                  const completed = q.metrics?.completedCount ?? q.metrics?.completed ?? 0;
 
                   return (
                     <tr key={q.id} className="infra-table-row">
